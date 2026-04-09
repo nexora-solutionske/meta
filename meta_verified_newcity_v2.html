@@ -1,0 +1,294 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+  .mv-page { background: #fff; min-height: 100vh; color: #1c1e21; }
+  .mv-nav { background: #fff; border-bottom: 1px solid #e4e6eb; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .mv-nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; color: #0866ff; }
+  .mv-hero { background: #0866ff; padding: 48px 24px 56px; text-align: center; color: #fff; }
+  .mv-congrats-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35); border-radius: 100px; padding: 8px 20px; font-size: 14px; font-weight: 600; margin-bottom: 24px; }
+  .check-circle { width: 20px; height: 20px; background: #23c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .mv-hero h1 { font-size: clamp(22px, 5vw, 40px); font-weight: 700; line-height: 1.15; margin-bottom: 14px; }
+  .mv-hero h1 em { font-style: normal; color: #a8ccff; }
+  .mv-hero p { font-size: 16px; opacity: 0.9; max-width: 540px; margin: 0 auto 10px; line-height: 1.6; }
+  .mv-hero .sub { font-size: 14px; opacity: 0.72; }
+  .mv-section { max-width: 1040px; margin: 0 auto; padding: 48px 20px; }
+  .mv-section-title { text-align: center; font-size: 26px; font-weight: 700; color: #1c1e21; margin-bottom: 6px; }
+  .mv-section-sub { text-align: center; font-size: 15px; color: #65676b; margin-bottom: 36px; }
+  .mv-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  .mv-plan { background: #fff; border: 1.5px solid #e4e6eb; border-radius: 16px; padding: 28px 22px; cursor: pointer; transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s; position: relative; overflow: hidden; }
+  .mv-plan:hover { border-color: #0866ff; transform: translateY(-3px); box-shadow: 0 10px 36px rgba(8,102,255,0.13); }
+  .mv-plan.featured { border-color: #0866ff; border-width: 2px; }
+  .mv-plan.featured::after { content: 'Most Popular'; position: absolute; top: 14px; right: -30px; background: #0866ff; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 40px; transform: rotate(45deg); letter-spacing: 0.5px; }
+  .plan-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+  .plan-label.plus { color: #23c55e; }
+  .plan-label.premium { color: #0866ff; }
+  .plan-label.max { color: #f02849; }
+  .plan-name { font-size: 24px; font-weight: 700; color: #1c1e21; margin-bottom: 4px; }
+  .plan-price { font-size: 34px; font-weight: 700; color: #1c1e21; margin: 12px 0 4px; line-height: 1; }
+  .plan-price span { font-size: 15px; font-weight: 400; color: #65676b; }
+  .plan-desc { font-size: 14px; color: #65676b; margin-bottom: 20px; line-height: 1.55; }
+  .plan-features { list-style: none; margin-bottom: 24px; }
+  .plan-features li { font-size: 14px; color: #1c1e21; padding: 5px 0; display: flex; align-items: flex-start; gap: 9px; line-height: 1.45; }
+  .feat-dot { width: 16px; height: 16px; border-radius: 50%; background: #0866ff; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; }
+  .feat-dot.green { background: #23c55e; }
+  .feat-dot.red { background: #f02849; }
+  .plan-btn { width: 100%; padding: 13px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; color: #fff; }
+  .plan-btn:hover { opacity: 0.88; }
+  .plan-btn.plus { background: #23c55e; }
+  .plan-btn.premium { background: #0866ff; }
+  .plan-btn.max { background: #f02849; }
+
+  .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .modal { background: #fff; border-radius: 12px; width: 420px; max-width: 95vw; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .pp-hd { background: #003087; padding: 16px 20px; display: flex; align-items: center; }
+  .pp-logo { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+  .pp-logo em { color: #009cde; font-style: normal; }
+  .pp-hd-sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-left: 6px; margin-top: 4px; }
+  .pp-ssl { display: flex; align-items: center; gap: 4px; font-size: 11px; color: rgba(255,255,255,0.55); margin-left: auto; }
+  .pp-body { padding: 24px; }
+  .pp-merchant-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #e4e6eb; }
+  .pp-icon { width: 44px; height: 44px; border-radius: 50%; background: #003087; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; }
+  .pp-merchant-name { font-size: 15px; font-weight: 600; color: #1c1e21; }
+  .pp-merchant-sub { font-size: 13px; color: #65676b; }
+  .pp-amount-block { text-align: center; margin: 16px 0 22px; }
+  .pp-label { font-size: 13px; color: #65676b; }
+  .pp-amount-val { font-size: 38px; font-weight: 700; color: #1c1e21; line-height: 1.1; }
+  .pp-plan-name { font-size: 13px; color: #65676b; margin-top: 4px; }
+  .pp-processing { text-align: center; padding: 6px 0 14px; }
+  .spinner { width: 36px; height: 36px; border: 3px solid #e4e6eb; border-top-color: #009cde; border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pp-proc-txt { font-size: 14px; color: #65676b; }
+  .pp-success { padding: 32px 24px; text-align: center; display: none; }
+  .pp-ok-icon { width: 56px; height: 56px; background: #00a550; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .pp-ok-title { font-size: 20px; font-weight: 700; color: #1c1e21; margin-bottom: 8px; }
+  .pp-ok-amount { font-size: 30px; font-weight: 700; color: #00a550; margin-bottom: 6px; }
+  .pp-ok-sub { font-size: 14px; color: #65676b; margin-bottom: 24px; line-height: 1.5; }
+  .pp-continue { width: 100%; padding: 13px; background: #009cde; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .pp-continue:hover { background: #007db5; }
+
+  .success-section { display: none; background: #f0f7ff; border: 2px solid #0866ff; border-radius: 16px; padding: 40px 28px; text-align: center; max-width: 680px; margin: 0 auto 48px; }
+  .success-section.show { display: block; }
+  .success-icon-wrap { width: 68px; height: 68px; background: #0866ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+  .success-title { font-size: 24px; font-weight: 700; color: #1c1e21; margin-bottom: 10px; }
+  .success-msg { font-size: 15px; color: #65676b; margin-bottom: 26px; line-height: 1.6; }
+  .download-btn { display: inline-flex; align-items: center; gap: 8px; background: #0866ff; color: #fff; padding: 13px 26px; border-radius: 8px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; }
+  .download-btn:hover { background: #0753d4; }
+  .mv-footer { background: #f0f2f5; border-top: 1px solid #e4e6eb; padding: 20px; text-align: center; font-size: 13px; color: #65676b; }
+</style>
+
+<div class="mv-page">
+  <nav class="mv-nav">
+    <div class="mv-nav-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="14" fill="#0866ff"/>
+        <path d="M18.5 9h-2.25C15.56 9 15 9.56 15 10.25V12h3.5l-.5 3H15v7h-3v-7h-2v-3h2v-1.75C12 8.123 13.123 7 14.875 7H18.5v2z" fill="white"/>
+      </svg>
+      Meta Verified
+    </div>
+    <span style="background:#e7f3ff;color:#0866ff;padding:4px 12px;border-radius:100px;font-weight:600;font-size:12px;">Business Setup</span>
+  </nav>
+
+  <div class="mv-hero">
+    <div class="mv-congrats-badge">
+      <div class="check-circle">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      Setup Successful
+    </div>
+    <h1>Congratulations,<br><em>Newcity Real Estate!</em></h1>
+    <p>Your Meta Pixel and Google Tag Manager have been successfully configured. Your ad tracking is live and data is flowing into Meta Events Manager.</p>
+    <p class="sub">Now complete your business verification to unlock the full power of Meta for your brand.</p>
+  </div>
+
+  <div class="mv-section">
+    <div class="mv-section-title">Choose your Meta Verified plan</div>
+    <div class="mv-section-sub">Get your verified badge, enhanced account protection, and priority support</div>
+    <div class="mv-plans">
+
+      <div class="mv-plan" onclick="openPayment('Plus','$49.99/month',49.99)">
+        <div class="plan-label plus">Starter</div>
+        <div class="plan-name">Plus</div>
+        <div class="plan-price">$49.99 <span>/month per profile</span></div>
+        <div class="plan-desc">Get verified and build trust with your audience on one platform.</div>
+        <ul class="plan-features">
+          <li><div class="feat-dot green"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Verified badge on Facebook or Instagram</li>
+          <li><div class="feat-dot green"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Impersonation protection</li>
+          <li><div class="feat-dot green"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Enhanced support (chat or email 24/7)</li>
+          <li><div class="feat-dot green"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Search optimization & featured profile</li>
+          <li><div class="feat-dot green"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Exclusive stickers & profile features</li>
+        </ul>
+        <button class="plan-btn plus">Get Plus</button>
+      </div>
+
+      <div class="mv-plan featured" onclick="openPayment('Premium','$149.99/month',149.99)">
+        <div class="plan-label premium">Recommended</div>
+        <div class="plan-name">Premium</div>
+        <div class="plan-price">$149.99 <span>/month per profile</span></div>
+        <div class="plan-desc">Verified on both Facebook and Instagram — the complete package for growing businesses.</div>
+        <ul class="plan-features">
+          <li><div class="feat-dot"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Verified badge on Facebook & Instagram</li>
+          <li><div class="feat-dot"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Priority support — faster issue resolution</li>
+          <li><div class="feat-dot"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Proactive impersonation monitoring</li>
+          <li><div class="feat-dot"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Links in Reels (4 per month)</li>
+          <li><div class="feat-dot"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Subscriber badge & exclusive stickers</li>
+          <li><div class="feat-dot"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Request agent call-back</li>
+        </ul>
+        <button class="plan-btn premium">Get Premium</button>
+      </div>
+
+      <div class="mv-plan" onclick="openPayment('Max','$499.99/month',499.99)">
+        <div class="plan-label red" style="color:#f02849;">Ultimate</div>
+        <div class="plan-name">Max</div>
+        <div class="plan-price">$499.99 <span>/month per profile</span></div>
+        <div class="plan-desc">The ultimate Meta Verified experience for established businesses and brands.</div>
+        <ul class="plan-features">
+          <li><div class="feat-dot red"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Everything in Premium</li>
+          <li><div class="feat-dot red"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Active case monitoring & agent escalation</li>
+          <li><div class="feat-dot red"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Links in Reels (6 per month)</li>
+          <li><div class="feat-dot red"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Personalized content strategy advice</li>
+          <li><div class="feat-dot red"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Custom chat themes & add images to links</li>
+          <li><div class="feat-dot red"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Priority ad review & early feature access</li>
+        </ul>
+        <button class="plan-btn max">Get Max</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="success-section" id="successSection">
+    <div class="success-icon-wrap">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M7 16l6 6 12-12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="success-title">You're now Meta Verified!</div>
+    <div class="success-msg" id="successMsg">Your subscription is active. The Newcity Real Estate verified badge will appear on your Meta profiles within 24 hours.</div>
+    <button class="download-btn" onclick="downloadInvoice()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 8l3 3 3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download Invoice
+    </button>
+  </div>
+
+  <div class="mv-footer">
+    Meta &copy; 2025 &nbsp;&bull;&nbsp; Privacy Policy &nbsp;&bull;&nbsp; Terms of Service &nbsp;&bull;&nbsp; Meta Verified Help
+    <div style="margin-top:8px;font-size:11px;color:#9aa0a6;">*Prototype for demonstration purposes only. Pricing: $49.99/month (Plus), $149.99/month (Premium), $499.99/month (Max). Renews automatically.</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="pp-hd">
+      <div>
+        <div class="pp-logo">Pay<em>Pal</em></div>
+        <div class="pp-hd-sub">Secure Checkout</div>
+      </div>
+      <div class="pp-ssl">
+        <svg width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="0.5" y="4.5" width="10" height="8" rx="1.5" stroke="rgba(255,255,255,0.5)"/><path d="M2.5 4.5V3a3 3 0 016 0v1.5" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/><circle cx="5.5" cy="9" r="1" fill="rgba(255,255,255,0.5)"/></svg>
+        SSL Secured
+      </div>
+    </div>
+    <div class="pp-body" id="ppProcessing">
+      <div class="pp-merchant-row">
+        <div class="pp-icon">MV</div>
+        <div>
+          <div class="pp-merchant-name">Meta Verified</div>
+          <div class="pp-merchant-sub">meta.com · Business Subscription</div>
+        </div>
+      </div>
+      <div class="pp-amount-block">
+        <div class="pp-label">Total due today</div>
+        <div class="pp-amount-val" id="ppAmt">$49.99</div>
+        <div class="pp-plan-name" id="ppPlanName">Meta Verified Plus — Monthly</div>
+      </div>
+      <div class="pp-processing">
+        <div class="spinner"></div>
+        <div class="pp-proc-txt">Processing your payment securely…</div>
+      </div>
+    </div>
+    <div class="pp-success" id="ppSuccess">
+      <div class="pp-ok-icon">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M5 13l5.5 5.5L21 7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="pp-ok-title">Payment Successful</div>
+      <div class="pp-ok-amount" id="ppOkAmt">$49.99</div>
+      <div class="pp-ok-sub" id="ppOkSub">Payment for Meta Verified Plus was successful. A confirmation has been sent to your PayPal email.</div>
+      <button class="pp-continue" onclick="window.location.href='https://business.facebook.com/l'">Continue to Meta Verified</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var curPlan = '', curPrice = '', curAmt = 0;
+
+  function openPayment(plan, price, amount) {
+    curPlan = plan; curPrice = price; curAmt = amount;
+    document.getElementById('ppAmt').textContent = '$' + amount.toFixed(2);
+    document.getElementById('ppPlanName').textContent = 'Meta Verified ' + plan + ' — Monthly';
+    document.getElementById('ppProcessing').style.display = 'block';
+    document.getElementById('ppSuccess').style.display = 'none';
+    document.getElementById('overlay').classList.add('show');
+    setTimeout(function() {
+      document.getElementById('ppProcessing').style.display = 'none';
+      document.getElementById('ppOkAmt').textContent = '$' + amount.toFixed(2);
+      document.getElementById('ppOkSub').textContent = 'Payment of $' + amount.toFixed(2) + ' for Meta Verified ' + plan + ' was successful. A confirmation has been sent to your PayPal email.';
+      document.getElementById('ppSuccess').style.display = 'block';
+    }, 2800);
+  }
+
+  function closePayment() {
+    document.getElementById('overlay').classList.remove('show');
+    var s = document.getElementById('successSection');
+    s.classList.add('show');
+    document.getElementById('successMsg').textContent = 'Your Meta Verified ' + curPlan + ' subscription (' + curPrice + ') is now active. The Newcity Real Estate verified badge will appear on your Meta profiles within 24 hours. Thank you for verifying your business!';
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function downloadInvoice() {
+    var d = new Date();
+    var num = 'META-INV-' + d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2) + '-NCR001';
+    var lines = [
+      'INVOICE',
+      '=======================================================',
+      'Invoice No:  ' + num,
+      'Date:        ' + d.toDateString(),
+      'Status:      PAID',
+      '=======================================================',
+      '',
+      'FROM:',
+      'Meta Platforms, Inc.',
+      '1 Meta Way, Menlo Park, CA 94025',
+      'meta.com',
+      '',
+      'BILLED TO:',
+      'Newcity Real Estate',
+      'Meta Business Account',
+      '',
+      '=======================================================',
+      'DESCRIPTION                             AMOUNT',
+      '-------------------------------------------------------',
+      'Meta Verified ' + curPlan + ' — Monthly Subscription    $' + curAmt.toFixed(2),
+      'Pixel & GTM Setup: Completed',
+      '-------------------------------------------------------',
+      'SUBTOTAL:                               $' + curAmt.toFixed(2) + ' USD',
+      'TAX:                                    $0.00',
+      'TOTAL PAID:                             $' + curAmt.toFixed(2) + ' USD',
+      '=======================================================',
+      '',
+      'Payment Method: PayPal',
+      'Transaction ID: PP-' + Math.random().toString(36).substr(2,10).toUpperCase(),
+      '',
+      'Thank you for choosing Meta Verified.',
+      '-------------------------------------------------------',
+      'PROTOTYPE NOTICE: This invoice was generated for',
+      'demonstration purposes only.',
+    ].join('\n');
+    var blob = new Blob([lines], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = num + '.txt'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById('overlay').addEventListener('click', function(e) {
+    if (e.target === this && document.getElementById('ppSuccess').style.display !== 'none') closePayment();
+  });
+</script>
